@@ -20,13 +20,59 @@ func main() {
 
 	// 默认
 	a := pinyin.NewArgs()
-	fmt.Println(pinyin.Pinyin(hans, a))
+	fmt.Println("default:", pinyin.Pinyin(hans, a)) // [[zhong] [guo] [ren]]
+	fmt.Println(pinyin.Slug(hans, a))               // zhong-guo-ren
+
+	a.Style = pinyin.Finals
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[ong] [uo] [en]]
+
+	a.Style = pinyin.FinalsTone
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[ōng] [uó] [én]]
+
+	a.Style = pinyin.FinalsTone2
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[o1ng] [uo2] [e2n]]
+
+	a.Style = pinyin.FinalsTone3
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[ong1] [uo2] [en2]]
+
+	a.Style = pinyin.FirstLetter
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[z] [g] [r]]
+
+	a.Style = pinyin.Initials
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[zh] [g] [r]]
+
+	a.Style = pinyin.Normal
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[zhong] [guo] [ren]]
 
 	// 包含声调
 	a.Style = pinyin.Tone
-	fmt.Println(pinyin.Pinyin(hans, a))
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[zhōng] [guó] [rén]]
 
 	// 声调用数字表示
 	a.Style = pinyin.Tone2
-	fmt.Println(pinyin.Pinyin(hans, a))
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[zho1ng] [guo2] [re2n]]
+
+	a.Style = pinyin.Tone3
+	fmt.Println(pinyin.Pinyin(hans, a)) // [[zhong1] [guo2] [ren2]]
+
+	// 开启多音字模式
+	b := pinyin.NewArgs()
+	b.Heteronym = true
+	fmt.Println(pinyin.Pinyin(hans, b)) // [[zhong zhong] [guo] [ren]]
+
+	b.Style = pinyin.Tone2
+	fmt.Println(pinyin.Pinyin(hans, b)) // [[zho1ng zho4ng] [guo2] [re2n]]
+
+	fmt.Println(pinyin.Version)
+	fmt.Println(pinyin.Author)
+	fmt.Println(pinyin.License)
+	fmt.Println(pinyin.Copyright)
+
+	// Fallback 默认配置: 如何处理没有拼音的字符(忽略这个字符)
+	han := "中国人abc"
+	c := pinyin.NewArgs()
+	c.Fallback = func(r rune, a pinyin.Args) []string {
+		return []string{string(r)}
+	}
+	fmt.Println(pinyin.Pinyin(han, c)) // [[zhong] [guo] [ren] [a] [b] [c]]
 }
