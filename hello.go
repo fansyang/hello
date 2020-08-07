@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/fansyang/hello/morestrings"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
-	pinyin "github.com/mozillazg/go-pinyin"
+	"github.com/mozillazg/go-pinyin"
+	"github.com/skip2/go-qrcode"
 )
 
 func main() {
@@ -82,4 +82,7 @@ func main() {
 		return []string{string(r)}
 	}
 	fmt.Println(pinyin.Pinyin(han, c)) // [[zhong] [guo] [ren] [a] [b] [c]]
+
+	// 使用go-qrcode库生成一个二维码图片
+	qrcode.WriteFile("https://www.baidu.com", qrcode.Medium, 256, "./qrcode.png")
 }
