@@ -84,5 +84,8 @@ func main() {
 	fmt.Println(pinyin.Pinyin(han, c)) // [[zhong] [guo] [ren] [a] [b] [c]]
 
 	// 使用go-qrcode库生成一个二维码图片
-	qrcode.WriteFile("https://www.baidu.com", qrcode.Medium, 256, "./qrcode.png")
+	err := qrcode.WriteFile("https://github.com/fansyang/hello", qrcode.Medium, 256, "./qrcode.png")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
