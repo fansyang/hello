@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/dchest/captcha"
 	"github.com/fansyang/hello/morestrings"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
@@ -88,4 +92,40 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	http.HandleFunc("/captcha/generate", func(w http.ResponseWriter, r *http.Request) {
+		id := captcha.NewLen(6)
+		if _, err := fmt.Fprint(w, id); err != nil {
+			log.Println("generate captcha error", err)
+		}
+	})
+
+	http.HandleFunc("/captcha/image", func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+		if id == "" {
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		}
+		w.Header().Set("Content-Type", "image/png")
+		if err := captcha.WriteImage(w, id, 120, 80); err != nil {
+			log.Println("show captcha error", err)
+		}
+	})
+
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			log.Println("parseForm error", err)
+			http.Error(w, "Internal Error", http.StatusInternalServerError)
+			return
+		}
+
+		id := r.FormValue("id")
+		value := r.FormValue("value")
+		if captcha.VerifyString(id, value) {
+			fmt.Fprint(w, "ok")
+		} else {
+			fmt.Fprint(w, "mismatch")
+		}
+	})
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
